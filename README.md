@@ -23,3 +23,16 @@ docker run -d --name tp-database --network app-network \
 docker run -d --name adminer --network app-network -p 8090:8080 adminer
 
 Question 1-4
+
+1-4 A multistage build separates building from running. The first stage uses a JDK and Maven to compile the app into a .jar; the second stage starts from a lightweight JRE image and only copies that .jar. The final image is smaller and more secure, since it contains no build tools or source code.
+
+Steps:
+
+FROM eclipse-temurin:21-jdk-alpine AS myapp-build: build stage with the JDK.
+ENV / WORKDIR: set and move into the app folder.
+RUN apk add maven: install Maven.
+COPY pom.xml + RUN mvn dependency:go-offline: download dependencies (cached as long as pom.xml doesn’t change).
+COPY src + RUN mvn package -DskipTests: compile and build the .jar.
+FROM eclipse-temurin:21-jre-alpine: run stage, with only the Java runtime.
+COPY --from=myapp-build ...: copy the .jar from the build stage.
+ENTRYPOINT ["java", "-jar", "myapp.jar"]: start the app when the container runs.
