@@ -75,3 +75,20 @@ docker push <user>/tp-httpd:1.0
 Question 1-10
 
 Images are stored locally by default. Pushing them to an online registry makes them available to other team members and other machines (servers, CI/CD pipelines), which can pull and run them without rebuilding. Versioned tags also keep a history of each release.
+
+
+Question 2-1 
+
+Testcontainers are Java libraries that start real Docker containers during tests (here a PostgreSQL database). Integration tests run against a real, disposable database instead of a mock, and the container is removed when tests end.
+
+Question 2-2 
+
+GitHub secrets store sensitive data like credentials or tokens encrypted, outside the code. They can be used in the pipeline without being visible in the repository or in the logs (GitHub masks them).
+
+Question 2-3 
+
+needs: test-backend makes the Docker job wait for the test job and run only if it succeeds. Without it, both jobs run in parallel, so an image could be built and pushed even if the code doesn’t compile or tests fail.
+
+Question 2-4
+
+Pushing images to a registry makes the tested version of the app available for deployment: any server or teammate can pull and run it without rebuilding. It’s the delivery step of the CI/CD pipeline.
