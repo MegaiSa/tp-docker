@@ -27,3 +27,38 @@ jobs:
       # Clean, compile, run unit + integration tests
       - name: Build and test with Maven
         run: mvn -B clean verify --file backend/pom.xml
+
+  build-and-push-docker-image:
+    # Run only if the backend compiles and all tests pass
+    needs: test-backend
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Log in only on master (secrets are not available on PRs from forks)
+      - name: Login to DockerHub
+        if: github.ref == 'refs/heads/master'
+        run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login --username ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+
+      # Build every image on all branches, push only on master
+      - name: Build image and push backend
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/tp-backend:latest
+          push: ${{ github.ref == 'refs/heads/master' }}
+
+      - name: Build image and push database
+        uses: docker/build-push-action@v6
+        with:
+          context: ./database
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/tp-database:latest
+          push: ${{ github.ref == 'refs/heads/master' }}
+
+      - name: Build image and push httpd
+        uses: docker/build-push-action@v6
+        with:
+          context: ./httpd
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/tp-httpd:latest
+          push: ${{ github.ref == 'refs/heads/master' }}
