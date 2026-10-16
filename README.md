@@ -36,3 +36,9 @@ COPY src + RUN mvn package -DskipTests: compile and build the .jar.
 FROM eclipse-temurin:21-jre-alpine: run stage, with only the Java runtime.
 COPY --from=myapp-build ...: copy the .jar from the build stage.
 ENTRYPOINT ["java", "-jar", "myapp.jar"]: start the app when the container runs.
+
+Question 1-5 
+
+A reverse proxy is a single entry point in front of the backend: clients only talk to it, and it forwards requests to the right service. This means the backend doesn’t need to be exposed directly, and the proxy can handle shared concerns like SSL/HTTPS, load balancing between several backend instances, or serving a front-end.
+
+
