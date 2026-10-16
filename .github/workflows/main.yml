@@ -28,6 +28,10 @@ jobs:
       - name: Build and test with Maven
         run: mvn -B clean verify --file backend/pom.xml
 
+      # Send the code analysis to SonarCloud (quality gate)
+      - name: SonarCloud analysis
+        run: mvn -B verify sonar:sonar -Dsonar.projectKey=MegaiSa_tp-docker -Dsonar.organization=megaisa -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{ secrets.SONAR_TOKEN }} --file backend/pom.xml
+
   build-and-push-docker-image:
     # Run only if the backend compiles and all tests pass
     needs: test-backend
