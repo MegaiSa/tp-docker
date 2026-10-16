@@ -41,4 +41,37 @@ Question 1-5
 
 A reverse proxy is a single entry point in front of the backend: clients only talk to it, and it forwards requests to the right service. This means the backend doesn’t need to be exposed directly, and the proxy can handle shared concerns like SSL/HTTPS, load balancing between several backend instances, or serving a front-end.
 
+Question 1-6 
 
+Docker compose lets us define the whole multi-container application in a single file and manage it with one command, instead of running each container manually with long commands. It handles networks, volumes, environment variables and startup order, making the setup reproducible and easy to share.
+
+Question 1-7
+
+docker compose up -d --build: build images and start all services in the background
+docker compose down: stop and remove containers and networks (-v also removes volumes)
+docker compose ps: list the services and their status
+docker compose logs -f <service>: follow a service’s logs
+docker compose restart <service>: restart a service
+docker compose build: rebuild the images
+
+Question 1-8
+
+database: built from ./database, credentials loaded from a .env file, data persisted in the db-data volume, with a healthcheck (pg_isready).
+backend: built from ./backend, connects to the database via its service name; starts only once the database is healthy.
+httpd: reverse proxy, the only service exposing a port (80).
+
+Two networks segregate the services: frontend-network (httpd ↔ backend) and backend-network (backend ↔ database), so httpd can’t reach the database. All services use restart: unless-stopped.
+
+Question 1-9
+
+docker login
+docker tag tp01-database <user>/tp-database:1.0
+docker tag tp01-backend <user>/tp-backend:1.0
+docker tag tp01-httpd <user>/tp-httpd:1.0
+docker push <user>/tp-database:1.0
+docker push <user>/tp-backend:1.0
+docker push <user>/tp-httpd:1.0
+
+Question 1-10
+
+Images are stored locally by default. Pushing them to an online registry makes them available to other team members and other machines (servers, CI/CD pipelines), which can pull and run them without rebuilding. Versioned tags also keep a history of each release.
